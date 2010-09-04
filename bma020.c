@@ -135,7 +135,7 @@ int data_poll(struct sensors_data_device_t *dev, sensors_data_t* data) {
 
         data->sensor=SENSOR_TYPE_ORIENTATION;
         data->vector.status=SENSOR_STATUS_ACCURACY_HIGH;
-        usleep(200000);
+        usleep(10000);
 
         return SENSOR_TYPE_ORIENTATION;
     } else {
