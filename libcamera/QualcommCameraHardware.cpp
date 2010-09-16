@@ -287,8 +287,6 @@ QualcommCameraHardware::QualcommCameraHardware()
       mAutoFocusFd(-1),
       mInPreviewCallback(false),
       mCameraRecording(false),
-      mCurSharpness(3),
-      mCurSaturation(3),
       mCurContrast(3),
       mCurBrightness(3),
       mCurZoom(0)
@@ -1244,7 +1242,7 @@ void QualcommCameraHardware::runAutoFocus()
     // resolution before we focus
     setZoom();
 
-	afMode = (isp3a_af_mode_t)attr_lookup(focus_modes, mParameters.get("focus-mode"));
+	afMode = (isp3a_af_mode_t)getParm("focus-mode",focus_modes);
     /* This will block until either AF completes or is cancelled. */
     LOGV("af start (fd %d)", mAutoFocusFd);
     bool status = native_set_afmode(mAutoFocusFd, afMode);
@@ -1824,6 +1822,7 @@ void QualcommCameraHardware::setEffect()
 void QualcommCameraHardware::setWhiteBalance()
 {
     int32_t value = getParm("whitebalance", whitebalance);
+    int32_t effectval = getParm("effect", effect);
     if (value != NOT_FOUND) {
         native_set_parm(CAMERA_SET_PARM_WB, sizeof(value), (void *)&value);
     }
@@ -1872,15 +1871,10 @@ void QualcommCameraHardware::setZoom()
 void QualcommCameraHardware::setSaturation()
 {
     int32_t value = atoi(mParameters.get("saturation"));
-
-    if (value == mCurSaturation) {
-	return;
-    }
-
-    mCurSaturation = value;
+    int32_t effectval = getParm("effect", effect);
 
     if (value != NOT_FOUND) {
-	value*=2;
+	    value*=2;
         native_set_parm(CAMERA_SET_PARM_SATURATION, sizeof(value), (void *)&value);
     }    
 }
@@ -1960,50 +1954,32 @@ void QualcommCameraHardware::setOrientation()
 
 void QualcommCameraHardware::setFocusMode()
 {
-    const char *str = mParameters.get("focus-mode");
-    if (str != NULL) {
-        int32_t value = attr_lookup(focus_modes, str);
-        if (value != NOT_FOUND) {
-            mParameters.set("focus-mode", str);
-            // Focus step is reset to infinity when preview is started. We do
-            // not need to do anything now.
-            return;
-        }
+    int32_t value = getParm("focus-mode",focus_modes);
+    if (value != NOT_FOUND) {
+        // Focus step is reset to infinity when preview is started. We do
+        // not need to do anything now.
+        return;
     }
-    LOGE("Invalid focus mode value: %s", (str == NULL) ? "NULL" : str);
     return;
 }
 
 void QualcommCameraHardware::setISOValue() {
     int8_t temp_hjr;
-    const char *str = mParameters.get("iso");
-    if (str != NULL) {
-        int value = (camera_iso_mode_type)attr_lookup(
-          iso, str);
-        if (value != NOT_FOUND) {
-            camera_iso_mode_type temp = (camera_iso_mode_type) value;
-            mParameters.set("iso", str);
-            native_set_parm(CAMERA_SET_PARM_ISO, sizeof(camera_iso_mode_type), (void *)&temp);
-            return;
-        }
+    int value = (camera_iso_mode_type)getParm("iso",iso);
+    if (value != NOT_FOUND) {
+        camera_iso_mode_type temp = (camera_iso_mode_type) value;
+        native_set_parm(CAMERA_SET_PARM_ISO, sizeof(camera_iso_mode_type), (void *)&temp);
     }
-    LOGE("Invalid Iso value: %s", (str == NULL) ? "NULL" : str);
     return;
 }
 
 void QualcommCameraHardware::setAutoExposure()
 {
-    const char *str = mParameters.get("auto-exposure");
-    if (str != NULL) {
-        int32_t value = attr_lookup(autoexposure, str);
-        if (value != NOT_FOUND) {
-            mParameters.set("auto-exposure", str);
-            native_set_parm(CAMERA_SET_PARM_EXPOSURE, sizeof(value),
-                                       (void *)&value);
-            return;
-        }
+    int32_t value = getParm("auto-exposure",autoexposure);
+    if (value != NOT_FOUND) {
+        native_set_parm(CAMERA_SET_PARM_EXPOSURE, sizeof(value),
+                                   (void *)&value);
     }
-    LOGE("Invalid auto exposure value: %s", (str == NULL) ? "NULL" : str);
     return;
 }
 

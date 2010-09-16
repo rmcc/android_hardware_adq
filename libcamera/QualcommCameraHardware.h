@@ -430,8 +430,6 @@ private:
     bool mCameraRecording;
 
     // Avoid unnecessary ioctls, store prev values
-    int mCurSharpness;
-    int mCurSaturation;
     int mCurContrast;
     int mCurBrightness;
     int mCurZoom;
