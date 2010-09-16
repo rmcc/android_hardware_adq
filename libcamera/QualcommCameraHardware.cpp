@@ -287,7 +287,6 @@ QualcommCameraHardware::QualcommCameraHardware()
       mAutoFocusFd(-1),
       mInPreviewCallback(false),
       mCameraRecording(false),
-      mCurContrast(3),
       mCurBrightness(3),
       mCurZoom(0)
 {
@@ -321,7 +320,7 @@ void QualcommCameraHardware::initDefaultParameters()
     p.set("focus-mode", "auto");
 
     p.set("saturation", "3");
-    p.set("contrast", "3");
+    //p.set("contrast", "3");
     p.set("sharpness", "3");
     p.set("luma-adaptation", "1");
     p.set("iso", "auto");
@@ -1462,21 +1461,21 @@ status_t QualcommCameraHardware::setParameters(
     mParameters = params;
 
 
+    setZoom();
+    //setSharpness();
     setSaturation();
     //setContrast();
-    //setSharpness();
-    setAntibanding();
     setEffect();
-    setWhiteBalance();
     // FIXME: set nightshot and luma adaptatiom
-    setBrightness();
     //setRotation();
    
-    setZoom();
     //setOrientation();
-    setISOValue();
-    setFocusMode();
+    setAntibanding();
     setAutoExposure();
+    setWhiteBalance();
+    setFocusMode();
+    setBrightness();
+    setISOValue();
 
     LOGV("setParameters: X");
     return NO_ERROR ;
@@ -1823,6 +1822,10 @@ void QualcommCameraHardware::setWhiteBalance()
 {
     int32_t value = getParm("whitebalance", whitebalance);
     int32_t effectval = getParm("effect", effect);
+
+    if (effectval != CAMERA_EFFECT_OFF)
+        value = CAMERA_WB_AUTO;
+
     if (value != NOT_FOUND) {
         native_set_parm(CAMERA_SET_PARM_WB, sizeof(value), (void *)&value);
     }
@@ -1873,26 +1876,30 @@ void QualcommCameraHardware::setSaturation()
     int32_t value = atoi(mParameters.get("saturation"));
     int32_t effectval = getParm("effect", effect);
 
+    if (effectval != CAMERA_EFFECT_OFF)
+        value = 5;
+    else if (value != NOT_FOUND) {
+        value *= 2;
+        if (value > 0) {
+            value-=1;
+        }
+    }
+
     if (value != NOT_FOUND) {
-	    value*=2;
         native_set_parm(CAMERA_SET_PARM_SATURATION, sizeof(value), (void *)&value);
-    }    
+    }
+    return;
 }
 
 void QualcommCameraHardware::setContrast()
 {
 	int32_t value = atoi(mParameters.get("contrast"));
 
-	if (value == mCurContrast) {
-		return;
-	}
-
-	mCurContrast = value;
-
 	if (value != NOT_FOUND) {
-		value*=2;
-		value-=1;
-		if (value < 0) value = 0;
+        value *= 2;
+        if (value > 0) {
+            value-=1;
+        }
 		native_set_parm(CAMERA_SET_PARM_CONTRAST, sizeof(value), (void *)&value);
 	}    
 }
