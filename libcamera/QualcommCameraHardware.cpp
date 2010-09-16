@@ -355,7 +355,7 @@ void QualcommCameraHardware::initDefaultParameters()
 
     p.set("max-saturation", "5");
     //p.set("max-contrast", "5");
-    //p.set("max-sharpness", "5");
+    p.set("max-sharpness", "5");
 
     p.set("zoom-supported", "true");
     p.set("max-zoom", "9");
@@ -1462,7 +1462,7 @@ status_t QualcommCameraHardware::setParameters(
 
 
     setZoom();
-    //setSharpness();
+    setSharpness();
     setSaturation();
     //setContrast();
     setEffect();
@@ -1908,16 +1908,10 @@ void QualcommCameraHardware::setSharpness()
 {
     int32_t value = atoi(mParameters.get("sharpness"));
 
-    /*if (value == mCurContrast) {
-	return;
-    }
-
-    mCurContrast = value;*/
-
     if (value != NOT_FOUND) {
-	value*=2;
-	value-=1;
-	if (value < 0) value = 0;
+	    value*=2;
+	    value-=1;
+	    if (value < 0) value = 0;
         native_set_parm(CAMERA_SET_PARM_SHARPNESS, sizeof(value), (void *)&value);
     }    
 }
