@@ -1469,7 +1469,6 @@ status_t QualcommCameraHardware::setParameters(
     // FIXME: set nightshot and luma adaptatiom
     //setRotation();
    
-    //setOrientation();
     setAntibanding();
     setAutoExposure();
     setWhiteBalance();
@@ -1932,25 +1931,6 @@ void QualcommCameraHardware::setBrightness()
 	if (value < 0) value = 0;
         native_set_parm(CAMERA_SET_PARM_BRIGHTNESS, sizeof(value), (void *)&value);
     }    
-}
-
-void QualcommCameraHardware::setOrientation()
-{
-    const char *str = mParameters.get("orientation");
-
-    if (str != NULL) {
-        if (strcmp(str, "portrait") == 0 || strcmp(str, "landscape") == 0) {
-            // Camera service needs this to decide if the preview frames and raw
-            // pictures should be rotated.
-            LOGD("Setting orientation to: %s", str);
-            mParameters.set("orientation", str);
-        } else {
-            LOGE("Invalid orientation value: %s", str);
-            return;
-        }
-    }
-    LOGD("orientation done");
-    return;
 }
 
 void QualcommCameraHardware::setFocusMode()

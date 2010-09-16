@@ -374,7 +374,6 @@ private:
     void setSharpness();
     void setBrightness();
     void setRotation();
-    void setOrientation();
     void setISOValue();
     void setFocusMode();
     void setAutoExposure();
