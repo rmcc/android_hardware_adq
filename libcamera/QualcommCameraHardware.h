@@ -208,11 +208,9 @@ class QualcommCameraHardware : public CameraHardwareInterface {
 public:
 
     virtual sp<IMemoryHeap> getPreviewHeap() const;
-    virtual sp<IMemoryHeap> getPreviewHeapnew(int i) const;
     virtual sp<IMemoryHeap> getRawHeap() const;
     virtual void setCallbacks(notify_callback notify_cb,
                               data_callback data_cb,
-                              data_indexed_callback data_indexed_cb,
                               data_callback_timestamp data_cb_timestamp,
                               void* user);
 
@@ -294,8 +292,7 @@ private:
 
         void completeInitialization();
        bool initialized() const {
-            return ((mHeapnew[3] != NULL && mHeapnew[3]->base() != MAP_FAILED) ||
-                   (mHeap != NULL && mHeap->base() != MAP_FAILED));
+            return (mHeap != NULL && mHeap->base() != MAP_FAILED);
         }
 
  /*       bool initialized() const {
@@ -309,7 +306,6 @@ private:
         int mFrameSize;
         int mFrameOffset;
         sp<MemoryHeapBase> mHeap;
-        sp<MemoryHeapBase> mHeapnew[4];
         sp<MemoryBase> *mBuffers;
 
         const char *mName;
@@ -397,7 +393,6 @@ private:
 
     notify_callback    mNotifyCb;
     data_callback      mDataCb;
-    data_indexed_callback      mDataIndexedCb;
     data_callback_timestamp mDataCbTimestamp;
     void               *mCallbackCookie;
 
