@@ -1540,7 +1540,6 @@ sp<QualcommCameraHardware> QualcommCameraHardware::getInstance()
         return sp<QualcommCameraHardware>();
     }
 }
-static ssize_t previewframe_offset = 3;
 
 void QualcommCameraHardware::receivePreviewFrame(struct msm_frame_t *frame)
 {
@@ -1574,15 +1573,9 @@ void QualcommCameraHardware::receivePreviewFrame(struct msm_frame_t *frame)
 
     if (mMsgEnabled & CAMERA_MSG_VIDEO_FRAME) {
         mReleasedRecordingFrame = false;
-        mDataCbTimestamp(systemTime(), CAMERA_MSG_VIDEO_FRAME, mPreviewHeap->mBuffers[previewframe_offset], mCallbackCookie); /* guess? */
-	//LOGV("offset sent to recording was %d",(previewframe_offset+1)&3);
-	//LOGV("passed callback");
+        mDataCbTimestamp(systemTime(), CAMERA_MSG_VIDEO_FRAME, mPreviewHeap->mBuffers[offset], mCallbackCookie); /* guess? */
 
     }
-
-    previewframe_offset--;
-    previewframe_offset &= 3;
-	//LOGV("offset adjusted to %d",previewframe_offset);
 
     if (mMsgEnabled & CAMERA_MSG_VIDEO_FRAME) {
         Mutex::Autolock rLock(&mRecordFrameLock);
